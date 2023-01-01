@@ -129,6 +129,7 @@ export default function Transactions(props) {
                         <MenuItem value={'Phone'}>Phone</MenuItem>
                         <MenuItem value={'Car'}>Car</MenuItem>
                         <MenuItem value={'Car Insurance'}>Car Insurance</MenuItem>
+                        <MenuItem value={'Gas'}>Gas</MenuItem>
                         <MenuItem value={'Subscriptions'}>Subscriptions</MenuItem>
                         <MenuItem value={'Personal stuff'}>Personal stuff</MenuItem>
                         <MenuItem value={'Cat'}>Cat</MenuItem>
@@ -159,10 +160,12 @@ export default function Transactions(props) {
                 <Table sx={{ minWidth: 100 }} size="small" aria-label="transactions table">
                     <TableHead>
                     <TableRow>
+                        <TableCell/>
                         <TableCell>Date</TableCell>
                         <TableCell>Name</TableCell>
                         <TableCell>Income</TableCell>
                         <TableCell>Cost</TableCell>
+                        <TableCell>Category</TableCell>
                     </TableRow>
                     </TableHead>
                     <TableBody>
