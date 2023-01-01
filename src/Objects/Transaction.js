@@ -1,30 +1,32 @@
-class Transaction {    
-    getTransactionId() {}
-    getTransactionName() {}
-    getTransactionDate() {}
+export class BaseTransaction {    
+    getId() {}
+    getDesc() {}
+    getDate() {}
     getIncome() {}
     getCost() {}
+    getCategory() {}
 }
 
-export class CIBCTransaction extends Transaction{
+export class CIBCTransaction extends BaseTransaction{
     constructor(transaction) {
         super();
         this.date = transaction[0];
-        this.name = transaction[1];
+        this.desc = transaction[1];
         this.cost = transaction[2];
         this.income = transaction[3];
-        this.id = [this.date, this.name, this.cost, this.income].join('');
+        this.category = "";
+        this.id = [this.date, this.desc, this.cost, this.income].join('');
     }
 
-    getTransactionId() {
+    getId() {
         return this.id;
     }
 
-    getTransactionName() {
-        return this.name;
+    getDesc() {
+        return this.desc;
     }
 
-    getTransactionDate() {
+    getDate() {
         return this.date;
     }
 
@@ -36,7 +38,47 @@ export class CIBCTransaction extends Transaction{
         return this.cost;
     }
 
+    getCategory() {
+        return this.category;
+    }
+
+    setId(id) {
+        this.id = id;
+    }
+
+    setDesc(desc) {
+        this.desc = desc;
+    }
+
+    setDate(date) {
+        this.date = date;
+    }
+
+    setIncome(income) {
+        this.income = income;
+    }
+
+    setCost(cost) {
+        this.cost = cost;
+    }
+
+    setCategory(category) {
+        this.category = category;
+    }
+
+
     isCost() {
         return this.cost === 0
+    }
+
+    getJSON() {
+        return {
+            "transaction": this.id,
+            "desc": this.desc,
+            "date": this.date,
+            "income": this.income,
+            "cost": this.cost,
+            "category": this.category
+        }
     }
 }

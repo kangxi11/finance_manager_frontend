@@ -8,88 +8,146 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import _ from 'lodash';
+import axios from 'axios';
 
-
-const columns = [
-    { id: 'name', label: 'Name', minWidth: 170 },
-    { id: 'code', label: 'ISO\u00a0Code', minWidth: 100 },
-    {
-      id: 'population',
-      label: 'Population',
-      minWidth: 170,
-      align: 'right',
-      format: (value) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'size',
-      label: 'Size\u00a0(km\u00b2)',
-      minWidth: 170,
-      align: 'right',
-      format: (value) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'density',
-      label: 'Density',
-      minWidth: 170,
-      align: 'right',
-      format: (value) => value.toFixed(2),
-    }
-];
   
-function createData(name, code, population, size) {
-    const density = population / size;
-    return { name, code, population, size, density };
-}
-  
-const rows = [
-    createData('India', 'IN', 1324171354, 3287263),
-    createData('China', 'CN', 1403500365, 9596961),
-    createData('Italy', 'IT', 60483973, 301340),
-    createData('United States', 'US', 327167434, 9833520),
-    createData('Canada', 'CA', 37602103, 9984670),
-    createData('Australia', 'AU', 25475400, 7692024),
-    createData('Germany', 'DE', 83019200, 357578),
-    createData('Ireland', 'IE', 4857000, 70273),
-    createData('Mexico', 'MX', 126577691, 1972550),
-    createData('Japan', 'JP', 126317000, 377973),
-    createData('France', 'FR', 67022000, 640679),
-    createData('United Kingdom', 'GB', 67545757, 242495),
-    createData('Russia', 'RU', 146793744, 17098246),
-    createData('Nigeria', 'NG', 200962417, 923768),
-    createData('Brazil', 'BR', 210147125, 8515767),
-];
-
 export default function Transactions(props) {
-    const onFileChange = (e) => {
-        console.log(e.target.files[0]);
-        const file = e.target.files[0];
-        let transactions = [];
-        papaparse.parse(file, {
+
+    const [transactions, setTransactions] = React.useState([]);
+    const [categories, setCategories] = React.useState([]);
+    let rowsDeleted = [];
+
+    async function onFileChange(e) {
+        await parseCSV(e.target.files[0]);
+    }
+
+    async function parseCSV(file) {
+        await new Promise((resolve, reject) => papaparse.parse(file, {
             header: false,
             complete: function(results) {
                 // read the data from results
                 const { data } = results;
-                //print the data in the console
-                // data.forEach(d => console.log(d));
-                data.forEach( d => transactions.push(new CIBCTransaction(d)));
+                let tempTransactions = [];
+                let tempCategories = [];
+                data.forEach( d => {
+                    if (d.length > 1) {
+                        tempTransactions.push(new CIBCTransaction(d));
+                        tempCategories.push("");
+                    }
+                });
+                resolve({tempTransactions, tempCategories});
             }
-        });
-        console.log(transactions);
+        })).then(
+            results => {
+                setTransactions([...results.tempTransactions]);
+                setCategories([...results.tempCategories]);
+            }
+        ).catch(//log the error
+            err=>console.warn("Something went wrong:",err)
+        )
     }
 
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-  
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
+    const deleteTransactionFromTable = (id) => {
+        if (rowsDeleted.includes(id)) {
+            _.remove(rowsDeleted, (d) => d === id);
+        } else {
+            rowsDeleted.push(id);
+        }
+    }
+
+    const handleCatgegoryChange = (category, i) => {
+        categories[i] = category;
+        setCategories([...categories]);
+        
+        transactions[i].setCategory(category);
+    }
+
+    const postButtonClicked = () => {
+        axios.post('http://localhost:3000/transactions',
+            {
+                'transactions': [
+                    ...transactions.map(t => t.getJSON())
+                ]
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                }
+            }
+        ).then(function (response) {
+            setTransactions([]);
+            setCategories([]);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });;
+    }
+
+    const getTransactions = () => {
+        return transactions.map((t, i) => (
+            <TableRow
+                key={t.getId()}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+                <TableCell padding="checkbox">
+                    <Checkbox
+                        color="primary"
+                        onChange={() => deleteTransactionFromTable(i)}
+                    />
+                </TableCell>
+                <TableCell component="th" scope="row">
+                    {t.getDate()}
+                </TableCell>
+                <TableCell>{t.getDesc()}</TableCell>
+                <TableCell>{`$${t.getIncome()}`}</TableCell>
+                <TableCell>{`$${t.getCost()}`}</TableCell>
+                <TableCell>
+                    <Select
+                        labelId="transaction-category"
+                        id="select-transaction-category"
+                        value={categories[i]}
+                        onChange={(e) => handleCatgegoryChange(e.target.value, i)}
+                        label="Category"
+                    >
+                        <MenuItem value="">
+                            <em>None</em>
+                        </MenuItem>
+                        <MenuItem value={'Rent'}>Rent</MenuItem>
+                        <MenuItem value={'Electricity'}>Electricity</MenuItem>
+                        <MenuItem value={'Internet'}>Internet</MenuItem>
+                        <MenuItem value={'Home Supplies'}>Home Supplies</MenuItem>
+                        <MenuItem value={'Groceries'}>Groceries</MenuItem>
+                        <MenuItem value={'Dining Out'}>Dining Out</MenuItem>
+                        <MenuItem value={'Phone'}>Phone</MenuItem>
+                        <MenuItem value={'Car'}>Car</MenuItem>
+                        <MenuItem value={'Car Insurance'}>Car Insurance</MenuItem>
+                        <MenuItem value={'Subscriptions'}>Subscriptions</MenuItem>
+                        <MenuItem value={'Personal stuff'}>Personal stuff</MenuItem>
+                        <MenuItem value={'Cat'}>Cat</MenuItem>
+                        <MenuItem value={'Gaming'}>Gaming</MenuItem>
+                        <MenuItem value={'Cloths'}>Cloths</MenuItem>
+                        <MenuItem value={'Gym'}>Gym</MenuItem>
+                        <MenuItem value={'Transit'}>Transit</MenuItem>
+                        <MenuItem value={'Vacation'}>Vacation</MenuItem>
+                        <MenuItem value={'Loans / Fees'}>Loans / Fees</MenuItem>
+                    </Select>
+                </TableCell>
+            </TableRow>
+        ));
+    }
+
+    const deleteButtonClicked = () => {
+        setTransactions(_.remove(transactions, (d, i) => !rowsDeleted.includes(i)));
+        rowsDeleted = [];
+    }
 
     return (
         <div>
@@ -97,54 +155,31 @@ export default function Transactions(props) {
                 Upload
                 <input hidden accept=".csv" multiple type="file" onChange={onFileChange}/>
             </Button>
-            <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-                <TableContainer sx={{ maxHeight: 440 }}>
-                    <Table stickyHeader aria-label="sticky table">
+            <TableContainer component={Paper} sx={{paddingLeft: 50, paddingRight: 50, width: '60%'}}>
+                <Table sx={{ minWidth: 100 }} size="small" aria-label="transactions table">
                     <TableHead>
-                        <TableRow>
-                        {columns.map((column) => (
-                            <TableCell
-                            key={column.id}
-                            align={column.align}
-                            style={{ minWidth: column.minWidth }}
-                            >
-                            {column.label}
-                            </TableCell>
-                        ))}
-                        </TableRow>
+                    <TableRow>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Income</TableCell>
+                        <TableCell>Cost</TableCell>
+                    </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows
-                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                        .map((row) => {
-                            return (
-                            <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                                {columns.map((column) => {
-                                const value = row[column.id];
-                                return (
-                                    <TableCell key={column.id} align={column.align}>
-                                    {column.format && typeof value === 'number'
-                                        ? column.format(value)
-                                        : value}
-                                    </TableCell>
-                                );
-                                })}
-                            </TableRow>
-                            );
-                        })}
+                        {getTransactions()}
                     </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
-                    component="div"
-                    count={rows.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
+                </Table>
+                <div>
+                    <Button variant="contained" component="label" color="error" onClick={deleteButtonClicked}>
+                        <IconButton>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Button>
+                    <Button variant="contained" component="label" color="success" onClick={postButtonClicked}>
+                        Add
+                    </Button>
+                </div>
+            </TableContainer>
         </div>
     );
 };
