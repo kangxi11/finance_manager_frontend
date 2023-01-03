@@ -4,18 +4,103 @@ import dayjs, { Dayjs } from 'dayjs';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+        backgroundColor: '#192841',
+        color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 14,
+    },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover,
+    },
+    // hide last border
+    '&:last-child td, &:last-child th': {
+        border: 0,
+    },
+}));
+  
+const categories = [
+    "Rent",
+    "Electricity",
+    "Internet",
+    "Home Supplies",
+    "Groceries",
+    "Dining Out",
+    "Phone",
+    "Car",
+    "Car Insurance",
+    "Subscriptions",
+    "Personal stuff",
+    "Cat",
+    "Gas",
+    "Gaming",
+    "Cloths",
+    "Gym",
+    "Transit",
+    "Vacation",
+    "Loans / Fees"
+];
+
+  
 export default function Home(props) {
     const [date, setDate] = useState(dayjs('2022-12-01'));
+    const [dateFilteredTransactions, setDateFilteredTransactions] = useState([]);
+    const [categorySummaries, setCategoriesSummaries] = useState({
+        "Rent": 0,
+        "Electricity": 0,
+        "Internet": 0,
+        "Home Supplies": 0,
+        "Groceries": 0,
+        "Dining Out": 0,
+        "Phone": 0,
+        "Car": 0,
+        "Car Insurance": 0,
+        "Subscriptions": 0,
+        "Personal stuff": 0,
+        "Cat": 0,
+        "Gas": 0,
+        "Gaming": 0,
+        "Cloths": 0,
+        "Gym": 0,
+        "Transit": 0,
+        "Vacation": 0,
+        "Loans / Fees": 0
+    });
+    const [totalSpend, setTotalSpend] = useState(0);
+
+    useEffect(() => {
+        const filteredTransactions = [...props.transactions].filter(
+            t => dayjs(t.date).month() === date.month() && dayjs(t.date).year() === date.year())
+        setDateFilteredTransactions(filteredTransactions);
+        
+        for(const category in categorySummaries) {
+            categorySummaries[category] = 0;
+        }
+        let totalSpendTemp = 0;
+        for (const transaction of filteredTransactions) {
+            categorySummaries[transaction.category] = categorySummaries[transaction.category] + parseInt(transaction.cost);
+            totalSpendTemp = totalSpendTemp + parseInt(transaction.cost);
+        }
+        setTotalSpend(totalSpendTemp);
+
+    }, [props.transactions, date]);
+
 
     return (
         <div>
@@ -24,7 +109,7 @@ export default function Home(props) {
                 <DatePicker
                     views={['year', 'month']}
                     label="Year and Month"
-                    minDate={dayjs('2022-01-01')}
+                    minDate={dayjs('2022-05-01')}
                     maxDate={dayjs('2023-12-01')}
                     value={date}
                     onChange={(newValue) => {
@@ -33,27 +118,59 @@ export default function Home(props) {
                     renderInput={(params) => <TextField {...params} helperText={null} />}
                 />
             </LocalizationProvider>
+            <h3>Summary</h3>
+            <TableContainer component={Paper} sx={{paddingLeft: 50, paddingRight: 50, width: '20%'}}>
+                <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                    <TableHead>
+                        <TableRow>
+                            <StyledTableCell>Category</StyledTableCell>
+                            <StyledTableCell>Total</StyledTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {categories.map((row) => (
+                            <StyledTableRow
+                                key={row}
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                            >
+                                <TableCell>{row}</TableCell>
+                                <TableCell>{`$${categorySummaries[row] === "" ? " -----" : categorySummaries[row]}`}</TableCell>
+                            </StyledTableRow>
+                        ))}
+                        <hr></hr>
+                        <StyledTableRow
+                                key='category-summary-total'
+                                sx={{ '&:last-child td, &:last-child th': { border: 0, 'font-weight': 'bold' } }}
+                            >
+                                <TableCell>Total Spend</TableCell>
+                                <TableCell>{`$${totalSpend === "" ? " -----" : totalSpend}`}</TableCell>
+                        </StyledTableRow>
+
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <h3>Transactions</h3>
             <TableContainer component={Paper} sx={{paddingLeft: 50, paddingRight: 50, width: '60%'}}>
                 <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>Date</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Income</TableCell>
-                            <TableCell>Cost</TableCell>
-                            <TableCell>Category</TableCell>
+                            <StyledTableCell>Date</StyledTableCell>
+                            <StyledTableCell>Name</StyledTableCell>
+                            <StyledTableCell>Income</StyledTableCell>
+                            <StyledTableCell>Cost</StyledTableCell>
+                            <StyledTableCell>Category</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                    {[...props.transactions].filter(t => dayjs(t.date).month() === date.month() && dayjs(t.date).year() === date.year()).map((row) => (
+                    {dateFilteredTransactions.map((row) => (
                         <TableRow
                             key={row.transaction}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
                             <TableCell>{row.date}</TableCell>
                             <TableCell>{row.desc}</TableCell>
-                            <TableCell>{`$${row.income}`}</TableCell>
-                            <TableCell>{`$${row.cost}`}</TableCell>
+                            <TableCell>{`$${row.income === "" ? " -----" : row.income}`}</TableCell>
+                            <TableCell>{`$${row.cost === "" ? " -----" : row.cost}`}</TableCell>
                             <TableCell>{row.category}</TableCell>
                         </TableRow>
                     ))}
