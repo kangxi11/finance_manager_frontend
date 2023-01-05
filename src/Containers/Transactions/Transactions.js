@@ -1,7 +1,11 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import papaparse from 'papaparse';
-import {CIBCTransaction} from '../../Objects/Transaction';
+import {CIBCTransaction, AMEXTransaction} from '../../Objects/Transaction';
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,7 +17,6 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import _ from 'lodash';
 import axios from 'axios';
 
@@ -22,6 +25,7 @@ export default function Transactions(props) {
 
     const [transactions, setTransactions] = React.useState([]);
     const [categories, setCategories] = React.useState([]);
+    const [transactionType, setTransactionType] = React.useState('CIBC');
     let rowsDeleted = [];
 
     async function onFileChange(e) {
@@ -38,8 +42,16 @@ export default function Transactions(props) {
                 let tempCategories = [];
                 data.forEach( d => {
                     if (d.length > 1) {
-                        tempTransactions.push(new CIBCTransaction(d));
-                        tempCategories.push("");
+                        if (transactionType === 'CIBC') {
+                            tempTransactions.push(new CIBCTransaction(d));
+                            tempCategories.push("");
+                        }
+                        if (transactionType === 'AMEX') {
+                            if (new Date(d[0]).toString() !== "Invalid Date") {
+                                tempTransactions.push(new AMEXTransaction(d));
+                                tempCategories.push("");
+                            }
+                        }
                     }
                 });
                 resolve({tempTransactions, tempCategories});
@@ -68,6 +80,10 @@ export default function Transactions(props) {
         
         transactions[i].setCategory(category);
     }
+
+    const onTransactionTypeChange = (e) => {
+        setTransactionType(e.target.value);
+      };    
 
     const postButtonClicked = () => {
         axios.post('http://localhost:3000/transactions',
@@ -154,8 +170,23 @@ export default function Transactions(props) {
         <div>
             <Button variant="contained" component="label">
                 Upload
-                <input hidden accept=".csv" multiple type="file" onChange={onFileChange}/>
+                <input hidden accept=".csv, xls" multiple type="file" onChange={onFileChange}/>
             </Button>
+            <Box sx={{ minWidth: 150, marginTop: 3 }}>
+                <FormControl>
+                    <InputLabel id="transaction-type-select-input-label">Type</InputLabel>
+                        <Select
+                            labelId="transaction-type-select-label"
+                            id="transaction-type-select"
+                            value={transactionType}
+                            label="Transaction Type"
+                            onChange={onTransactionTypeChange}
+                        >
+                            <MenuItem value={'CIBC'}>CIBC</MenuItem>
+                            <MenuItem value={'AMEX'}>AMEX</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
             <TableContainer component={Paper} sx={{paddingLeft: 50, paddingRight: 50, width: '60%'}}>
                 <Table sx={{ minWidth: 100 }} size="small" aria-label="transactions table">
                     <TableHead>

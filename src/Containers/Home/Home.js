@@ -137,7 +137,6 @@ export default function Home(props) {
                                 <TableCell>{`$${categorySummaries[row] === "" ? " -----" : categorySummaries[row]}`}</TableCell>
                             </StyledTableRow>
                         ))}
-                        <hr></hr>
                         <StyledTableRow
                                 key='category-summary-total'
                                 sx={{ '&:last-child td, &:last-child th': { border: 0, 'font-weight': 'bold' } }}
