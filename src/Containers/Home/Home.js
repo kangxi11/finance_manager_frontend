@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
