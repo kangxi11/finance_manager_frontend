@@ -86,7 +86,7 @@ export default function Transactions(props) {
       };    
 
     const postButtonClicked = () => {
-        axios.post(`${process.env.process.env.REACT_APP_NODE_SERVER}/transactions`,
+        axios.post(`${process.env.REACT_APP_NODE_SERVER}/transactions`,
             {
                 'transactions': [
                     ...transactions.map(t => t.getJSON())
