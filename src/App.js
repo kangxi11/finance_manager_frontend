@@ -5,6 +5,29 @@ import axios from 'axios';
 import Navbar from './Components/Navbar/Navbar';
 import Transactions from './Containers/Transactions/Transactions';
 import Home from './Containers/Home/Home';
+import Charts from './Containers/Charts/Charts';
+
+const categories = [
+  "Rent",
+  "Electricity",
+  "Internet",
+  "Home Supplies",
+  "Groceries",
+  "Dining Out",
+  "Phone",
+  "Car",
+  "Car Insurance",
+  "Subscriptions",
+  "Personal stuff",
+  "Cat",
+  "Gas",
+  "Gaming",
+  "Cloths",
+  "Gym",
+  "Transit",
+  "Vacation",
+  "Loans / Fees"
+];
 
 function App() {
 
@@ -34,9 +57,17 @@ function App() {
   const getContents = () => {
     switch (tab) {
       case 'home':
-        return <Home transactions={transactions} />;
+        return <Home
+          transactions={transactions}
+          categories={categories}
+        />;
       case 'transactions':
         return <Transactions />;
+      case 'charts':
+        return <Charts
+          transactions={transactions}
+          categories={categories}  
+        />;
       default:
         break;
     }

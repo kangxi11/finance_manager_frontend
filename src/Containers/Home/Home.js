@@ -34,29 +34,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
   
-const categories = [
-    "Rent",
-    "Electricity",
-    "Internet",
-    "Home Supplies",
-    "Groceries",
-    "Dining Out",
-    "Phone",
-    "Car",
-    "Car Insurance",
-    "Subscriptions",
-    "Personal stuff",
-    "Cat",
-    "Gas",
-    "Gaming",
-    "Cloths",
-    "Gym",
-    "Transit",
-    "Vacation",
-    "Loans / Fees"
-];
-
-  
 export default function Home(props) {
     const [date, setDate] = useState(dayjs('2022-12-01'));
     const [dateFilteredTransactions, setDateFilteredTransactions] = useState([]);
@@ -127,7 +104,7 @@ export default function Home(props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {categories.map((row) => (
+                        {props.categories.map((row) => (
                             <StyledTableRow
                                 key={row}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
