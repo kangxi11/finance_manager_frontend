@@ -70,8 +70,8 @@ export default function Home(props) {
         }
         let totalSpendTemp = 0;
         for (const transaction of filteredTransactions) {
-            categorySummaries[transaction.category] = categorySummaries[transaction.category] + parseInt(transaction.cost);
-            totalSpendTemp = totalSpendTemp + parseInt(transaction.cost);
+            categorySummaries[transaction.category] = categorySummaries[transaction.category] + parseFloat(transaction.cost.replace(',',''));
+            totalSpendTemp = totalSpendTemp + parseFloat(transaction.cost.replace(',',''));
         }
         setTotalSpend(totalSpendTemp);
 
@@ -110,7 +110,7 @@ export default function Home(props) {
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
                                 <TableCell>{row}</TableCell>
-                                <TableCell>{`$${categorySummaries[row] === "" ? " -----" : categorySummaries[row]}`}</TableCell>
+                                <TableCell>{`$${categorySummaries[row] === 0 ? " -----" : categorySummaries[row].toFixed(2)}`}</TableCell>
                             </StyledTableRow>
                         ))}
                         <StyledTableRow
@@ -118,7 +118,7 @@ export default function Home(props) {
                                 sx={{ '&:last-child td, &:last-child th': { border: 0, 'font-weight': 'bold' } }}
                             >
                                 <TableCell>Total Spend</TableCell>
-                                <TableCell>{`$${totalSpend === "" ? " -----" : totalSpend}`}</TableCell>
+                                <TableCell>{`$${totalSpend === 0 ? " -----" : totalSpend.toFixed(2)}`}</TableCell>
                         </StyledTableRow>
 
                     </TableBody>

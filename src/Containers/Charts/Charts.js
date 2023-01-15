@@ -54,8 +54,8 @@ export default function Charts(props) {
                 if (past12Months[i]['date'].year() === dayjs(transaction.date).year()
                     && past12Months[i]['date'].month() === dayjs(transaction.date).month()
                 ) {
-                    past12Months[i][transaction.category] = past12Months[i][transaction.category] + parseInt(transaction.cost);
-                    past12Months[i]['total'] = past12Months[i]['total'] + parseInt(transaction.cost);
+                    past12Months[i][transaction.category] = past12Months[i][transaction.category] + parseFloat(transaction.cost.replace(',',''));
+                    past12Months[i]['total'] = past12Months[i]['total'] + parseFloat(transaction.cost.replace(',',''));
                 }
             }
         }
@@ -84,7 +84,7 @@ export default function Charts(props) {
                                 <TableCell>{row}</TableCell>
                                 {past12MonthsTransactions.map((monthlyTransactions) => (
                                     <StyledTableCell key={monthlyTransactions['date'].format('M/D/YYYY')}>{
-                                        `$${monthlyTransactions[row] === 0 ? " -----" : monthlyTransactions[row]}`
+                                        `$${monthlyTransactions[row] === 0 ? " -----" : monthlyTransactions[row].toFixed(0)}`
                                     }</StyledTableCell>
                                 ))}
                             </StyledTableRow>
@@ -95,7 +95,7 @@ export default function Charts(props) {
                         >
                             <TableCell>Total Spend</TableCell>
                             {past12MonthsTransactions.map((monthlyTransactions) => (
-                                <TableCell>{`$${monthlyTransactions['total'] === "" ? " -----" : monthlyTransactions['total']}`}</TableCell>
+                                <TableCell>{`$${monthlyTransactions['total'] === "" ? " -----" : monthlyTransactions['total'].toFixed(0)}`}</TableCell>
                             ))}
                         </StyledTableRow>
                     </TableBody>
