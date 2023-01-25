@@ -35,7 +35,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
   
 export default function Home(props) {
-    const [date, setDate] = useState(dayjs('2022-12-01'));
+    const [date, setDate] = useState(dayjs());
     const [dateFilteredTransactions, setDateFilteredTransactions] = useState([]);
     const [categorySummaries, setCategoriesSummaries] = useState({
         "Rent": 0,
