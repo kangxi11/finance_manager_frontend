@@ -95,7 +95,7 @@ export default function Home(props) {
                 />
             </LocalizationProvider>
             <h3>Summary</h3>
-            <TableContainer component={Paper} sx={{paddingLeft: 50, paddingRight: 50, width: '20%'}}>
+            <TableContainer sx={{paddingLeft: 10, paddingRight: 10, width: '40%'}}>
                 <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
@@ -125,7 +125,7 @@ export default function Home(props) {
                 </Table>
             </TableContainer>
             <h3>Transactions</h3>
-            <TableContainer component={Paper} sx={{paddingLeft: 50, paddingRight: 50, width: '60%'}}>
+            <TableContainer sx={{paddingLeft: 10, paddingRight: 10, width: '60%'}}>
                 <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
@@ -138,7 +138,7 @@ export default function Home(props) {
                     </TableHead>
                     <TableBody>
                     {dateFilteredTransactions.map((row) => (
-                        <TableRow
+                        <StyledTableRow
                             key={row.transaction}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
@@ -147,7 +147,7 @@ export default function Home(props) {
                             <TableCell>{`$${row.income === "" ? " -----" : row.income}`}</TableCell>
                             <TableCell>{`$${row.cost === "" ? " -----" : row.cost}`}</TableCell>
                             <TableCell>{row.category}</TableCell>
-                        </TableRow>
+                        </StyledTableRow>
                     ))}
                     </TableBody>
                 </Table>

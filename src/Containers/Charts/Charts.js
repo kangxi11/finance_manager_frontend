@@ -65,7 +65,7 @@ export default function Charts(props) {
 
     return (
         <div>
-            <TableContainer component={Paper} sx={{paddingLeft: 50, paddingRight: 50, width: '80%'}}>
+            <TableContainer sx={{paddingLeft: 5, paddingRight: 5, width: '80%'}}>
                 <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
