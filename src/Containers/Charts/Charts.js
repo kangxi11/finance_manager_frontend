@@ -61,79 +61,44 @@ export default function Charts(props) {
             .attr("transform", `translate(${margin.left},     ${margin.top})`);
 
         // Add X axis and Y axis
-        var x = d3.scaleTime()
+        var xScale = d3.scaleTime()
             .range([0, width]);
-        var y = d3.scaleLinear().range([height, 0]);
+        var yScale = d3.scaleLinear().range([height, 0]);
 
-        x.domain(d3.extent(past12MonthsTransactions, (d) => { return d.date; }));
-        y.domain([0, d3.max(past12MonthsTransactions, (d) => { return d.total; })]);
+        xScale.domain(d3.extent(past12MonthsTransactions, (d) => { return d.date; }));
+        yScale.domain([0, d3.max(past12MonthsTransactions, (d) => { return d.total; })]);
 
         svg.append("g")
             .attr("transform", `translate(0, ${height})`)
-            .call(d3.axisBottom(x));   
+            .call(d3.axisBottom(xScale));
+        // Add X axis label:
+        svg.append("text")
+            .attr("text-anchor", "end")
+            .attr("x", width)
+            .attr("y", height+40 )
+            .text("Time (Month)");
+        
         svg.append("g")
-            .call(d3.axisLeft(y));
+            .call(d3.axisLeft(yScale));
 
-            // add the Line
-    var totalLine = d3.line()
-        .x((d) => { return x(d.date); })
-        .y((d) => { return y(d.total); });
+        let stackedData = d3.stack().keys(props.categories)(past12MonthsTransactions);
+        
+        const colorScale = d3.scaleOrdinal()
+            .domain(props.categories)
+            .range(d3.schemeSet2);
 
-    var rentLine = d3.line()
-        .x((d) => { return x(d.date); })
-        .y((d) => { return y(d.Rent); });
+        let areaGen = d3.area()
+            .x((d) => xScale(d => {console.log(d); return d.data.date.toDate()}))
+            .y0((d) => yScale(d[0]))
+            .y1((d) => yScale(d[1]));
 
-    var electricityLine = d3.line()
-        .x((d) => { return x(d.date); })
-        .y((d) => { return y(d.Electricity); });
-
-    var groceriesLine = d3.line()
-        .x((d) => { return x(d.date); })
-        .y((d) => { return y(d.Groceries); });
-
-    var diningOutLine = d3.line()
-        .x((d) => { return x(d.date); })
-        .y((d) => { return y(d['Dining Out']); });
-    
-    svg.append("path")
-        .data([past12MonthsTransactions])
-        .attr("class", "line")
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 1.5)
-        .attr("d", totalLine);
-
-    svg.append("path")
-        .data([past12MonthsTransactions])
-        .attr("class", "line")
-        .attr("fill", "none")
-        .attr("stroke", "#7a4ccf")
-        .attr("stroke-width", 1.5)
-        .attr("d", rentLine);
-
-    svg.append("path")
-        .data([past12MonthsTransactions])
-        .attr("class", "line")
-        .attr("fill", "none")
-        .attr("stroke", "#bcc44b")
-        .attr("stroke-width", 1.5)
-        .attr("d", electricityLine);
-
-    svg.append("path")
-        .data([past12MonthsTransactions])
-        .attr("class", "line")
-        .attr("fill", "none")
-        .attr("stroke", "green")
-        .attr("stroke-width", 1.5)
-        .attr("d", groceriesLine);
-
-    svg.append("path")
-        .data([past12MonthsTransactions])
-        .attr("class", "line")
-        .attr("fill", "none")
-        .attr("stroke", "#4ccf70")
-        .attr("stroke-width", 1.5)
-        .attr("d", diningOutLine);
+        svg.selectAll("mylayers")
+            .data(stackedData)
+            .enter()
+            .append("path")
+              .attr("class", function(d) { return "myArea " + d.key })
+              .style("fill", function(d) { return colorScale(d.key); })
+              .attr("d", areaGen);
     }
 
     return (
