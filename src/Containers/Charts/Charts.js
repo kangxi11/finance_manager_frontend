@@ -92,13 +92,46 @@ export default function Charts(props) {
             .y0((d) => yScale(d[0]))
             .y1((d) => yScale(d[1]));
         
+        let tooltip = d3.select("#line-graph-div")
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("position", "absolute");
+
+        let mouseover = function() {
+            tooltip.style("opacity", 1);
+            d3.select(this)
+                .style("stroke", "black")
+                .style("opacity", 1);
+        }
+        let mousemove = function(event,d) {
+            tooltip
+                .html(d.key)
+                .style("left", (event.pageX)+30 + "px")
+                .style("top", (event.pageY) + "px");
+        }
+        let mouseleave = function() {
+            tooltip.style("opacity", 0);
+            d3.select(this)
+                .style("stroke", "none")
+                .style("opacity", 0.8);
+        }
+
         svg.selectAll("mylayers")
-            .data(stackedData)
-            .enter()
-            .append("path")
-              .attr("class", function(d) { return "myArea " + d.key })
-              .style("fill", function(d) { return colorScale(d.key); })
-              .attr("d", areaGen);
+        .data(stackedData)
+        .enter()
+        .append("path")
+            .attr("class", function(d) { return "myArea " + d.key })
+            .style("fill", function(d) { return colorScale(d.key); })
+            .attr("d", areaGen)
+            .on("mouseover", mouseover)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave);
     }
 
     return (
@@ -143,7 +176,9 @@ export default function Charts(props) {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <svg id='line-graph'></svg>
+            <div id='line-graph-div'>
+                <svg id='line-graph'></svg>
+            </div>
         </div>
     )
 }
