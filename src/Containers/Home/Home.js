@@ -15,7 +15,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { StyledTableCell, StyledTableRow } from '../../Objects/TableStyler';
   
 export default function Home(props) {
-    const [date, setDate] = useState(dayjs());
+    const [date, setDate] = useState(dayjs().subtract(1,'months'));
     const [dateFilteredTransactions, setDateFilteredTransactions] = useState([]);
     const [categorySummaries, setCategoriesSummaries] = useState({
         "Rent": 0,
