@@ -88,10 +88,10 @@ export default function Charts(props) {
             .range(d3.schemeSet2);
 
         let areaGen = d3.area()
-            .x((d) => xScale(d => {console.log(d); return d.data.date.toDate()}))
+            .x(d => xScale(d.data.date.toDate()))
             .y0((d) => yScale(d[0]))
             .y1((d) => yScale(d[1]));
-
+        
         svg.selectAll("mylayers")
             .data(stackedData)
             .enter()
@@ -109,7 +109,9 @@ export default function Charts(props) {
                         <TableRow>
                             <StyledTableCell>Category</StyledTableCell>
                             {past12MonthsTransactions.map((monthlyTransactions) => (
-                                <StyledTableCell key={monthlyTransactions['date'].format('M/D/YYYY')}>{monthlyTransactions['date'].format('MMMM, YYYY')}</StyledTableCell>
+                                <StyledTableCell key={`category-table-${monthlyTransactions['date'].format('M/D/YYYY')}`}>
+                                    {monthlyTransactions['date'].format('MMMM, YYYY')}
+                                </StyledTableCell>
                             ))}
                         </TableRow>
                     </TableHead>
@@ -121,7 +123,7 @@ export default function Charts(props) {
                             >
                                 <TableCell>{row}</TableCell>
                                 {past12MonthsTransactions.map((monthlyTransactions) => (
-                                    <StyledTableCell key={monthlyTransactions['date'].format('M/D/YYYY')}>{
+                                    <StyledTableCell key={`main-table-${monthlyTransactions['date'].format('M/D/YYYY')}`}>{
                                         `$${monthlyTransactions[row] === 0 ? " -----" : monthlyTransactions[row].toFixed(0)}`
                                     }</StyledTableCell>
                                 ))}
@@ -133,7 +135,9 @@ export default function Charts(props) {
                         >
                             <TableCell>Total Spend</TableCell>
                             {past12MonthsTransactions.map((monthlyTransactions) => (
-                                <TableCell>{`$${monthlyTransactions['total'] === "" ? " -----" : monthlyTransactions['total'].toFixed(0)}`}</TableCell>
+                                <TableCell key={`total-table-${monthlyTransactions['date'].format('M/D/YYYY')}`}>
+                                    {`$${monthlyTransactions['total'] === "" ? " -----" : monthlyTransactions['total'].toFixed(0)}`}
+                                </TableCell>
                             ))}
                         </StyledTableRow>
                     </TableBody>
