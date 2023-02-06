@@ -91,7 +91,7 @@ function App() {
 					"Vacation": 0,
 					"Loans / Fees": 0,
 					'total': 0,
-					'date': dayjs(transaction.date)
+					'date': dayjs(transaction.date).startOf('month')
 				};
 			}
 			monthlySummaries[date][transaction.category] = monthlySummaries[date][transaction.category] + parseFloat(transaction.cost.replace(',',''));

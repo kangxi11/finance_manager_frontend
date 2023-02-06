@@ -46,7 +46,7 @@ export default function Charts(props) {
 					"Vacation": 0,
 					"Loans / Fees": 0,
                     "total": 0,
-                    'date': month
+                    'date': month.startOf('month')
 				});
             }
         };
