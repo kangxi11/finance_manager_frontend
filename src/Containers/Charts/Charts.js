@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import * as d3 from 'd3';
+import dayjs from 'dayjs';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,132 +7,53 @@ import TableCell  from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import dayjs from 'dayjs';
 
 import { StyledTableCell, StyledTableRow } from '../../Objects/TableStyler';
+import StackedLineChart from '../../Components/StackedLineChart/StackedLineChart';
 
 export default function Charts(props) {
+
     const [past12MonthsTransactions, setPast12MonthsTransactions] = useState([]);
 
-
     useEffect(() => {
+        let past12Months = [];
         const today = dayjs();
-        const past12Months = [];
 
         for (let i = 0; i < 12; ++i) {
-            const monthSummary = {};
-            monthSummary['date'] = today.subtract(i, 'month');    
+           const month = today.subtract(i, 'month');
 
-            for(const j in props.categories) {
-                monthSummary[props.categories[j]] = 0;
+            if (month.format('MM-YYYY') in props.monthlySummaries) {
+                past12Months.push(props.monthlySummaries[month.format('MM-YYYY')]);
+            } else {
+                past12Months.push({
+					"Rent": 0,
+					"Electricity": 0,
+					"Internet": 0,
+					"Home Supplies": 0,
+					"Groceries": 0,
+					"Dining Out": 0,
+					"Phone": 0,
+					"Car": 0,
+					"Car Insurance": 0,
+					"Subscriptions": 0,
+					"Personal stuff": 0,
+					"Cat": 0,
+					"Gas": 0,
+					"Gaming": 0,
+					"Cloths": 0,
+					"Gym": 0,
+					"Transit": 0,
+					"Vacation": 0,
+					"Loans / Fees": 0,
+                    "total": 0,
+                    'date': month
+				});
             }
-            monthSummary['total'] = 0;
-
-            past12Months.push(monthSummary);
-        }
-
-        for (const transaction of props.transactions) {
-            for (const i in past12Months) {
-                if (past12Months[i]['date'].year() === dayjs(transaction.date).year()
-                    && past12Months[i]['date'].month() === dayjs(transaction.date).month()
-                ) {
-                    past12Months[i][transaction.category] = past12Months[i][transaction.category] + parseFloat(transaction.cost.replace(',',''));
-                    past12Months[i]['total'] = past12Months[i]['total'] + parseFloat(transaction.cost.replace(',',''));
-                }
-            }
-        }
-
+        };
+        console.log(past12Months);
         setPast12MonthsTransactions(past12Months);
+            
     }, []);
-
-    useEffect(() => {
-        createLineGraph();
-    }, [past12MonthsTransactions]);
-
-    const createLineGraph = async () => {
-        var margin = { top: 20, right: 20, bottom: 50, left: 70 },
-        width = 960 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
-    
-        let svg = d3.select("#line-graph")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left},     ${margin.top})`);
-
-        // Add X axis and Y axis
-        var xScale = d3.scaleTime()
-            .range([0, width]);
-        var yScale = d3.scaleLinear().range([height, 0]);
-
-        xScale.domain(d3.extent(past12MonthsTransactions, (d) => { return d.date; }));
-        yScale.domain([0, d3.max(past12MonthsTransactions, (d) => { return d.total; })]);
-
-        svg.append("g")
-            .attr("transform", `translate(0, ${height})`)
-            .call(d3.axisBottom(xScale));
-        // Add X axis label:
-        svg.append("text")
-            .attr("text-anchor", "end")
-            .attr("x", width)
-            .attr("y", height+40 )
-            .text("Time (Month)");
-        
-        svg.append("g")
-            .call(d3.axisLeft(yScale));
-
-        let stackedData = d3.stack().keys(props.categories)(past12MonthsTransactions);
-        
-        const colorScale = d3.scaleOrdinal()
-            .domain(props.categories)
-            .range(d3.schemeSet2);
-
-        let areaGen = d3.area()
-            .x(d => xScale(d.data.date.toDate()))
-            .y0((d) => yScale(d[0]))
-            .y1((d) => yScale(d[1]));
-        
-        let tooltip = d3.select("#line-graph-div")
-            .append("div")
-            .style("opacity", 0)
-            .attr("class", "tooltip")
-            .style("background-color", "white")
-            .style("border", "solid")
-            .style("border-width", "2px")
-            .style("border-radius", "5px")
-            .style("padding", "5px")
-            .style("position", "absolute");
-
-        let mouseover = function() {
-            tooltip.style("opacity", 1);
-            d3.select(this)
-                .style("stroke", "black")
-                .style("opacity", 1);
-        }
-        let mousemove = function(event,d) {
-            tooltip
-                .html(d.key)
-                .style("left", (event.pageX)+30 + "px")
-                .style("top", (event.pageY) + "px");
-        }
-        let mouseleave = function() {
-            tooltip.style("opacity", 0);
-            d3.select(this)
-                .style("stroke", "none")
-                .style("opacity", 0.8);
-        }
-
-        svg.selectAll("mylayers")
-        .data(stackedData)
-        .enter()
-        .append("path")
-            .attr("class", function(d) { return "myArea " + d.key })
-            .style("fill", function(d) { return colorScale(d.key); })
-            .attr("d", areaGen)
-            .on("mouseover", mouseover)
-            .on("mousemove", mousemove)
-            .on("mouseleave", mouseleave);
-    }
 
     return (
         <div>
@@ -176,9 +97,10 @@ export default function Charts(props) {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <div id='line-graph-div'>
-                <svg id='line-graph'></svg>
-            </div>
+            <StackedLineChart
+                past12MonthsTransactions={past12MonthsTransactions}
+                categories={props.categories}            
+            />
         </div>
     )
 }
