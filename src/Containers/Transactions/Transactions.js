@@ -20,6 +20,7 @@ import Select from '@mui/material/Select';
 import _ from 'lodash';
 import axios from 'axios';
 
+import './Transactions.css';
   
 export default function Transactions(props) {
 
@@ -126,36 +127,37 @@ export default function Transactions(props) {
                 <TableCell>{`$${t.getIncome()}`}</TableCell>
                 <TableCell>{`$${t.getCost()}`}</TableCell>
                 <TableCell>
-                    <Select
-                        labelId="transaction-category"
-                        id="select-transaction-category"
-                        value={categories[i]}
-                        onChange={(e) => handleCatgegoryChange(e.target.value, i)}
-                        label="Category"
-                    >
-                        <MenuItem value="">
-                            <em>None</em>
-                        </MenuItem>
-                        <MenuItem value={'Rent'}>Rent</MenuItem>
-                        <MenuItem value={'Electricity'}>Electricity</MenuItem>
-                        <MenuItem value={'Internet'}>Internet</MenuItem>
-                        <MenuItem value={'Home Supplies'}>Home Supplies</MenuItem>
-                        <MenuItem value={'Groceries'}>Groceries</MenuItem>
-                        <MenuItem value={'Dining Out'}>Dining Out</MenuItem>
-                        <MenuItem value={'Phone'}>Phone</MenuItem>
-                        <MenuItem value={'Car'}>Car</MenuItem>
-                        <MenuItem value={'Car Insurance'}>Car Insurance</MenuItem>
-                        <MenuItem value={'Gas'}>Gas</MenuItem>
-                        <MenuItem value={'Subscriptions'}>Subscriptions</MenuItem>
-                        <MenuItem value={'Personal stuff'}>Personal stuff</MenuItem>
-                        <MenuItem value={'Cat'}>Cat</MenuItem>
-                        <MenuItem value={'Gaming'}>Gaming</MenuItem>
-                        <MenuItem value={'Cloths'}>Cloths</MenuItem>
-                        <MenuItem value={'Gym'}>Gym</MenuItem>
-                        <MenuItem value={'Transit'}>Transit</MenuItem>
-                        <MenuItem value={'Vacation'}>Vacation</MenuItem>
-                        <MenuItem value={'Loans / Fees'}>Loans / Fees</MenuItem>
-                    </Select>
+                    <FormControl fullWidth sx={{ width: 200, textAlign: 'left' }}>
+                        <Select
+                            labelId="transaction-category"
+                            id="select-transaction-category"
+                            value={categories[i]}
+                            onChange={(e) => handleCatgegoryChange(e.target.value, i)}
+                        >
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            <MenuItem value={'Rent'}>Rent</MenuItem>
+                            <MenuItem value={'Electricity'}>Electricity</MenuItem>
+                            <MenuItem value={'Internet'}>Internet</MenuItem>
+                            <MenuItem value={'Home Supplies'}>Home Supplies</MenuItem>
+                            <MenuItem value={'Groceries'}>Groceries</MenuItem>
+                            <MenuItem value={'Dining Out'}>Dining Out</MenuItem>
+                            <MenuItem value={'Phone'}>Phone</MenuItem>
+                            <MenuItem value={'Car'}>Car</MenuItem>
+                            <MenuItem value={'Car Insurance'}>Car Insurance</MenuItem>
+                            <MenuItem value={'Gas'}>Gas</MenuItem>
+                            <MenuItem value={'Subscriptions'}>Subscriptions</MenuItem>
+                            <MenuItem value={'Personal stuff'}>Personal stuff</MenuItem>
+                            <MenuItem value={'Cat'}>Cat</MenuItem>
+                            <MenuItem value={'Gaming'}>Gaming</MenuItem>
+                            <MenuItem value={'Cloths'}>Cloths</MenuItem>
+                            <MenuItem value={'Gym'}>Gym</MenuItem>
+                            <MenuItem value={'Transit'}>Transit</MenuItem>
+                            <MenuItem value={'Vacation'}>Vacation</MenuItem>
+                            <MenuItem value={'Loans / Fees'}>Loans / Fees</MenuItem>
+                        </Select>
+                    </FormControl>
                 </TableCell>
             </TableRow>
         ));
@@ -168,25 +170,38 @@ export default function Transactions(props) {
 
     return (
         <div>
-            <Button variant="contained" component="label">
-                Upload
-                <input hidden accept=".csv, xls" multiple type="file" onChange={onFileChange}/>
-            </Button>
-            <Box sx={{ minWidth: 150, marginTop: 3 }}>
-                <FormControl>
-                    <InputLabel id="transaction-type-select-input-label">Type</InputLabel>
-                        <Select
-                            labelId="transaction-type-select-label"
-                            id="transaction-type-select"
-                            value={transactionType}
-                            label="Transaction Type"
-                            onChange={onTransactionTypeChange}
-                        >
-                            <MenuItem value={'CIBC'}>CIBC</MenuItem>
-                            <MenuItem value={'AMEX'}>AMEX</MenuItem>
-                    </Select>
-                </FormControl>
-            </Box>
+            <div id="transactions-control-bar">
+                <Button variant="outlined" component="label" sx={{ height: "3.5rem"}}>
+                    Upload
+                    <input hidden accept=".csv, xls" multiple type="file" onChange={onFileChange}/>
+                </Button>
+                <Box sx={{ paddingLeft: 2, width: 150, textAlign: 'left' }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="transaction-type-select-input-label">Type</InputLabel>
+                            <Select
+                                labelId="transaction-type-select-label"
+                                id="transaction-type-select"
+                                value={transactionType}
+                                label="Transaction Type"
+                                onChange={onTransactionTypeChange}
+                            >
+                                <MenuItem value={'CIBC'}>CIBC</MenuItem>
+                                <MenuItem value={'AMEX'}>AMEX</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+
+                <div className='push'>
+                    <Button variant="outlined" component="label" sx={{ height: "3.5rem", marginRight: 2}} onClick={deleteButtonClicked}>
+                            <IconButton>
+                                <DeleteIcon />
+                            </IconButton>
+                        </Button>
+                    <Button variant="outlined" component="label" sx={{ height: "3.5rem"}} onClick={postButtonClicked}>
+                        Upload
+                    </Button>
+                </div>
+            </div>
             <TableContainer component={Paper} sx={{paddingLeft: 50, paddingRight: 50, width: '60%'}}>
                 <Table sx={{ minWidth: 100 }} size="small" aria-label="transactions table">
                     <TableHead>
@@ -203,16 +218,6 @@ export default function Transactions(props) {
                         {getTransactions()}
                     </TableBody>
                 </Table>
-                <div>
-                    <Button variant="contained" component="label" color="error" onClick={deleteButtonClicked}>
-                        <IconButton>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Button>
-                    <Button variant="contained" component="label" color="success" onClick={postButtonClicked}>
-                        Add
-                    </Button>
-                </div>
             </TableContainer>
         </div>
     );

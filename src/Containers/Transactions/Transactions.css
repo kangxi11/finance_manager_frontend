@@ -1,0 +1,11 @@
+#transactions-control-bar{
+    display: flex;
+    padding-top: 4rem;
+    padding-left: 15rem;
+    padding-right: 15rem;
+}
+
+.push {
+    margin-left: auto;
+    height: inherit;
+}
