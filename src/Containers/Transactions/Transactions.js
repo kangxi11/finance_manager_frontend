@@ -44,13 +44,17 @@ export default function Transactions(props) {
                 data.forEach( d => {
                     if (d.length > 1) {
                         if (transactionType === 'CIBC') {
-                            tempTransactions.push(new CIBCTransaction(d));
-                            tempCategories.push("");
+                            const transaction = new CIBCTransaction(d)
+                            tempTransactions.push(transaction);
+
+                            tempCategories.push(recommendCategory(transaction));
                         }
                         if (transactionType === 'AMEX') {
                             if (new Date(d[0]).toString() !== "Invalid Date") {
+                                const transaction = new AMEXTransaction(d)
                                 tempTransactions.push(new AMEXTransaction(d));
-                                tempCategories.push("");
+                                
+                                tempCategories.push(recommendCategory(transaction));
                             }
                         }
                     }
@@ -67,6 +71,13 @@ export default function Transactions(props) {
         )
     }
 
+    const recommendCategory = (transaction) => {
+        const stripedDesc = transaction.getDesc().replace(/[^a-zA-Z]/gi,'');
+        const matchedTransaction = _.find(props.rawTransactions, t => t.desc.replace(/[^a-zA-Z]/gi,'') === stripedDesc);
+        
+        return matchedTransaction === undefined ? '' : matchedTransaction.category;
+    }
+
     const deleteTransactionFromTable = (id) => {
         if (rowsDeleted.includes(id)) {
             _.remove(rowsDeleted, (d) => d === id);
@@ -75,7 +86,7 @@ export default function Transactions(props) {
         }
     }
 
-    const handleCatgegoryChange = (category, i) => {
+    const handleCategoryChange = (category, i) => {
         categories[i] = category;
         setCategories([...categories]);
         
@@ -132,7 +143,7 @@ export default function Transactions(props) {
                             labelId="transaction-category"
                             id="select-transaction-category"
                             value={categories[i]}
-                            onChange={(e) => handleCatgegoryChange(e.target.value, i)}
+                            onChange={(e) => handleCategoryChange(e.target.value, i)}
                         >
                             <MenuItem value="">
                                 <em>None</em>

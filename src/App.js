@@ -110,7 +110,7 @@ function App() {
 					categories={categories}
 				/>;
 			case 'transactions':
-				return <Transactions />;
+				return <Transactions rawTransactions={transactions}/>;
 			case 'charts':
 				return <Charts
 					transactions={transactions}
