@@ -75,7 +75,7 @@ export default function Home(props) {
                 />
             </LocalizationProvider>
             <h3>Summary</h3>
-            <TableContainer sx={{paddingLeft: 10, paddingRight: 10, width: '40%'}}>
+            <TableContainer sx={{width: '40%', margin: 'auto'}}>
                 <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
@@ -105,7 +105,7 @@ export default function Home(props) {
                 </Table>
             </TableContainer>
             <h3>Transactions</h3>
-            <TableContainer sx={{paddingLeft: 10, paddingRight: 10, width: '60%'}}>
+            <TableContainer sx={{width: '60%', margin: 'auto'}}>
                 <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
