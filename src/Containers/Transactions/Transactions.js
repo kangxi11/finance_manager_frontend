@@ -171,7 +171,7 @@ export default function Transactions(props) {
     return (
         <div>
             <div id="transactions-control-bar">
-                <Button variant="outlined" component="label" sx={{ height: "3.5rem"}}>
+                <Button variant="outlined" component="label" sx={{ height: "3.5rem", borderColor: "#192841", color: "#192841"}}>
                     Upload
                     <input hidden accept=".csv, xls" multiple type="file" onChange={onFileChange}/>
                 </Button>
@@ -192,17 +192,17 @@ export default function Transactions(props) {
                 </Box>
 
                 <div className='push'>
-                    <Button variant="outlined" component="label" sx={{ height: "3.5rem", marginRight: 2}} onClick={deleteButtonClicked}>
+                    <Button variant="outlined" component="label" sx={{ height: "3.5rem", marginRight: 2, borderColor: "#192841", color: "#192841"}} onClick={deleteButtonClicked}>
                             <IconButton>
                                 <DeleteIcon />
                             </IconButton>
                         </Button>
-                    <Button variant="outlined" component="label" sx={{ height: "3.5rem"}} onClick={postButtonClicked}>
+                    <Button variant="outlined" component="label" sx={{ height: "3.5rem", borderColor: "#192841", color: "#192841"}} onClick={postButtonClicked}>
                         Upload
                     </Button>
                 </div>
             </div>
-            <TableContainer component={Paper} sx={{paddingLeft: 50, paddingRight: 50, width: '60%'}}>
+            <TableContainer sx={{width: '60%', margin: 'auto', paddingTop: 5}}>
                 <Table sx={{ minWidth: 100 }} size="small" aria-label="transactions table">
                     <TableHead>
                     <TableRow>
