@@ -57,7 +57,7 @@ export default function Charts(props) {
 
     return (
         <div>
-            <TableContainer sx={{paddingLeft: 5, paddingRight: 5, paddingTop: 5, width: '80%'}}>
+            <TableContainer sx={{paddingTop: 5, width: '80%', margin: 'auto'}}>
                 <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
@@ -97,6 +97,7 @@ export default function Charts(props) {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <h3>Past 12 Months Transactions</h3>
             <StackedLineChart
                 past12MonthsTransactions={past12MonthsTransactions}
                 categories={props.categories}            
