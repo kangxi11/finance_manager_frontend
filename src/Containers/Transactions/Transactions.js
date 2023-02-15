@@ -45,16 +45,20 @@ export default function Transactions(props) {
                     if (d.length > 1) {
                         if (transactionType === 'CIBC') {
                             const transaction = new CIBCTransaction(d)
-                            tempTransactions.push(transaction);
+                            const category = recommendCategory(transaction);
 
-                            tempCategories.push(recommendCategory(transaction));
+                            tempCategories.push(category);
+                            transaction.setCategory(category);
+                            tempTransactions.push(transaction);
                         }
                         if (transactionType === 'AMEX') {
                             if (new Date(d[0]).toString() !== "Invalid Date") {
                                 const transaction = new AMEXTransaction(d)
-                                tempTransactions.push(new AMEXTransaction(d));
-                                
-                                tempCategories.push(recommendCategory(transaction));
+                                const category = recommendCategory(transaction);
+
+                                tempCategories.push(category);
+                                transaction.setCategory(category);
+                                tempTransactions.push(transaction);
                             }
                         }
                     }
