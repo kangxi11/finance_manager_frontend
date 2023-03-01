@@ -1,12 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
+
 import Button from '@mui/material/Button';
 import papaparse from 'papaparse';
-import {CIBCTransaction, AMEXTransaction} from '../../Objects/Transaction';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -17,16 +16,18 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Select from '@mui/material/Select';
+
 import _ from 'lodash';
 import axios from 'axios';
 
+import {CIBCTransaction, AMEXTransaction} from '../../Objects/Transaction';
 import './Transactions.css';
   
 export default function Transactions(props) {
 
-    const [transactions, setTransactions] = React.useState([]);
-    const [categories, setCategories] = React.useState([]);
-    const [transactionType, setTransactionType] = React.useState('CIBC');
+    const [transactions, setTransactions] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [transactionType, setTransactionType] = useState('CIBC');
     let rowsDeleted = [];
 
     async function onFileChange(e) {
@@ -99,7 +100,7 @@ export default function Transactions(props) {
 
     const onTransactionTypeChange = (e) => {
         setTransactionType(e.target.value);
-      };    
+    };
 
     const postButtonClicked = () => {
         axios.post(`${process.env.REACT_APP_NODE_SERVER}/transactions`,
@@ -187,7 +188,7 @@ export default function Transactions(props) {
         <div>
             <div id="transactions-control-bar">
                 <Button variant="outlined" component="label" sx={{ height: "3.5rem", borderColor: "#192841", color: "#192841"}}>
-                    Upload
+                    Import
                     <input hidden accept=".csv, xls" multiple type="file" onChange={onFileChange}/>
                 </Button>
                 <Box sx={{ paddingLeft: 2, width: 150, textAlign: 'left' }}>

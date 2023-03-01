@@ -38,6 +38,13 @@ export default function Navbar(props) {
                         >
                             Charts
                         </Button>
+                        <Button 
+                            className={props.tab === 'netWorth' ? 'navbar-button navbar-selected-button' : 'navbar-button'}
+                            color="inherit" 
+                            onClick={() => handleClick("netWorth")}
+                        >
+                            Net Worth
+                        </Button>
                     </ButtonGroup>
                 </div>
             </Toolbar>

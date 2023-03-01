@@ -50,7 +50,6 @@ export default function Charts(props) {
 				});
             }
         };
-        console.log(past12Months);
         setPast12MonthsTransactions(past12Months);
             
     }, []);

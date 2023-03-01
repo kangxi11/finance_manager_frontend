@@ -7,6 +7,7 @@ import Navbar from './Components/Navbar/Navbar';
 import Transactions from './Containers/Transactions/Transactions';
 import Home from './Containers/Home/Home';
 import Charts from './Containers/Charts/Charts';
+import NetWorth from './Containers/NetWorth/NetWorth';
 
 const categories = [
 	"Rent",
@@ -117,6 +118,8 @@ function App() {
 					monthlySummaries={monthlySummaries}
 					categories={categories}  
 				/>;
+			case 'netWorth':
+				return <NetWorth />
 			default:
 				break;
 		}
