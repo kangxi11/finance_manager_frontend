@@ -34,11 +34,13 @@ const categories = [
 function App() {
 
   	const [transactions, setTransactions] = useState([]);
+	const [netWorth, setNetWorth] = useState([]);
 	const [monthlySummaries, setMonthlySummaries] = useState({});
 	const [tab, setTab] = useState('home');
 
   	useEffect(() => {
     	getAndSetTransactions();
+		getAndSetNetWorth();
   	}, []);
 
 	useEffect(() => {
@@ -49,8 +51,8 @@ function App() {
 		axios.get(`${process.env.REACT_APP_NODE_SERVER}/transactions`,
 		{
 			headers: {
-			'Content-Type': 'application/json',
-			'Access-Control-Allow-Origin': '*'
+				'Content-Type': 'application/json',
+				'Access-Control-Allow-Origin': '*'
 			}
 		}
 		).then(function (response) {
@@ -58,6 +60,22 @@ function App() {
 				(d1, d2) => new Date(d2.date).getTime() - new Date(d1.date).getTime()
 			);
 			setTransactions([...temp]);
+		})
+		.catch(function (error) {
+			console.log(error);
+		});;
+	}
+
+	const getAndSetNetWorth = () => {
+		axios.get(`${process.env.REACT_APP_NODE_SERVER}/net-worth`,
+		{
+			headers: {
+				'Content-Type': 'application/json',
+				'Access-Control-Allow-Origin': '*'
+			}
+		}
+		).then(function (response) {
+			setNetWorth([...response.data.items]);
 		})
 		.catch(function (error) {
 			console.log(error);
@@ -119,7 +137,9 @@ function App() {
 					categories={categories}  
 				/>;
 			case 'netWorth':
-				return <NetWorth />
+				return <NetWorth
+					netWorth={netWorth}
+				/>
 			default:
 				break;
 		}

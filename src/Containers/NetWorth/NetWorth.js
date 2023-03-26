@@ -7,9 +7,26 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 import dayjs from 'dayjs';
 import axios from 'axios';
+import _ from 'lodash';
+
+import { StyledTableCell, StyledMinorTableCell, StyledTableRow } from '../../Objects/TableStyler';
+
+const NetWorthCategory = {
+    cash: 'cash',
+    tfsa: 'TFSA',
+    rrsp: 'RRSP',
+    fhsa: 'FHSA',
+    investments: 'investments'
+}
 
 export default function NetWorth(props) {
     const [type, setType] = useState("asset");
@@ -50,7 +67,7 @@ export default function NetWorth(props) {
                         person,
                         name,
                         value,
-                        today
+                        date: today
                     }
                 ]
             },
@@ -66,6 +83,27 @@ export default function NetWorth(props) {
         }).catch(function (error) {
             console.log(error);
         });
+    }
+
+    const createRows =  (category) => {
+        const groupBy = _.groupBy(props.netWorth.filter(d => d.category === NetWorthCategory[category]), d => d.name);
+        const rows = _.keys(groupBy).map(d => _.last(_.sortBy(groupBy[d], r => r.date)));
+        let total = 0;
+        _.forEach(rows, row => {
+            total = total + parseFloat(row.value)
+        })
+
+        return rows.map((row) => (
+            <StyledTableRow
+                key={row.itemId}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+                <TableCell></TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.person}</TableCell>
+                <TableCell>{`$${row.value === 0 ? " -----" : row.value}`}</TableCell>
+            </StyledTableRow>
+        ));
     }
 
     return (
@@ -93,10 +131,11 @@ export default function NetWorth(props) {
                             label="Category"
                             onChange={onCategoryChange}
                         >
-                            <MenuItem value={'cash'}>Cash</MenuItem>
-                            <MenuItem value={'TFSA'}>TFSA</MenuItem>
-                            <MenuItem value={'RRSP'}>RRSP</MenuItem>
-                            <MenuItem value={'investments'}>Investments</MenuItem>
+                            <MenuItem value={NetWorthCategory.cash}>Cash</MenuItem>
+                            <MenuItem value={NetWorthCategory.tfsa}>TFSA</MenuItem>
+                            <MenuItem value={NetWorthCategory.rrsp}>RRSP</MenuItem>
+                            <MenuItem value={NetWorthCategory.fhsa}>FHSA</MenuItem>
+                            <MenuItem value={NetWorthCategory.investments}>Investments</MenuItem>
                     </Select>
                 </FormControl>
                 <FormControl fullWidth sx={{ marginLeft: 2, width: 150, textAlign: 'left' }}>
@@ -122,6 +161,27 @@ export default function NetWorth(props) {
                     Upload
                 </Button>
             </Box>
+            <div>
+            <h3>Net Worth</h3>
+                <TableContainer sx={{width: '40%', margin: 'auto'}}>
+                    <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                        <TableHead>
+                            <TableRow>
+                                <StyledTableCell>Category</StyledTableCell>
+                                <StyledTableCell>Name</StyledTableCell>
+                                <StyledTableCell>Person</StyledTableCell>
+                                <StyledTableCell>Amount</StyledTableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>Cash</TableCell>
+                            </TableRow>
+                            {createRows(NetWorthCategory.cash)}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </div>
         </div>
     )
 }
