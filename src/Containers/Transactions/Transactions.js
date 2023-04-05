@@ -26,7 +26,6 @@ import './Transactions.css';
 export default function Transactions(props) {
 
     const [transactions, setTransactions] = useState([]);
-    const [categories, setCategories] = useState([]);
     const [transactionType, setTransactionType] = useState('CIBC');
     let rowsDeleted = [];
 
@@ -48,7 +47,6 @@ export default function Transactions(props) {
                             const transaction = new CIBCTransaction(d)
                             const category = recommendCategory(transaction);
 
-                            tempCategories.push(category);
                             transaction.setCategory(category);
                             tempTransactions.push(transaction);
                         }
@@ -57,7 +55,6 @@ export default function Transactions(props) {
                                 const transaction = new AMEXTransaction(d)
                                 const category = recommendCategory(transaction);
 
-                                tempCategories.push(category);
                                 transaction.setCategory(category);
                                 tempTransactions.push(transaction);
                             }
@@ -69,7 +66,6 @@ export default function Transactions(props) {
         })).then(
             results => {
                 setTransactions([...results.tempTransactions]);
-                setCategories([...results.tempCategories]);
             }
         ).catch(//log the error
             err=>console.warn("Something went wrong:",err)
@@ -91,11 +87,16 @@ export default function Transactions(props) {
         }
     }
 
-    const handleCategoryChange = (category, i) => {
-        categories[i] = category;
-        setCategories([...categories]);
-        
+    const handleCategoryChange = (category, i) => {        
         transactions[i].setCategory(category);
+        setTransactions([...transactions].map((t, j) => {
+            if (i === j) {
+                transactions[i].setCategory(category);
+                return transactions[i];
+            }
+
+            return t;
+        }));
     }
 
     const onTransactionTypeChange = (e) => {
@@ -117,7 +118,6 @@ export default function Transactions(props) {
             }
         ).then(function (response) {
             setTransactions([]);
-            setCategories([]);
         })
         .catch(function (error) {
             console.log(error);
@@ -147,7 +147,7 @@ export default function Transactions(props) {
                         <Select
                             labelId="transaction-category"
                             id="select-transaction-category"
-                            value={categories[i]}
+                            value={t.getCategory()}
                             onChange={(e) => handleCategoryChange(e.target.value, i)}
                         >
                             <MenuItem value="">
